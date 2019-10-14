@@ -6,6 +6,8 @@ import nltk
 import string
 from nltk.tokenize import word_tokenize
 from nltk.stem.porter import PorterStemmer
+from nltk.probability import FreqDist
+import gensim
 
 
 #1.1 open and load the text file
@@ -16,22 +18,36 @@ doc = f.read()
 blank_line_regex = r"(?:\r?\n){2,}"
 paragraphs = re.split(blank_line_regex, doc.strip())
 
-#1.3 filter out 'Gutenberg' paragraphs and 1.5 remove string punctiation + \r\n and lowercase 
+#1.3 filter out 'Gutenberg' paragraphs & 1.5 remove string punctiation + \r\t and lowercase 
 filtered_paragrahps = []
 for index, paragraph in enumerate(paragraphs):
     if "gutenberg" in paragraph.lower():
         continue
     else:
-        filtered_paragrahps.append(paragraph.lower().translate(str.maketrans('','',string.punctuation+"\n\r\t")))
+        filtered_paragrahps.append(paragraph.lower().translate(str.maketrans('','',string.punctuation+"\r\t")))
 
 #1.4 tokenize the paragraphs =>  each paragraph is a list of words
 #using NLTK Tokenizer Package which divides strings into lists of substrings.
-tokenized = [word_tokenize(word) for word in filtered_paragrahps]
+processedParagraphs = [word_tokenize(word) for word in filtered_paragrahps]
 
 
+#1.6 stem words
 stemmer = PorterStemmer()
-word = "Economics"
-print(stemmer.stem(word.lower()))
+for i, paragraph in enumerate(processedParagraphs):
+    for x, word in enumerate(paragraph):
+        paragraph[x] = stemmer.stem(paragraph[x])
 
-#print(tokenized)
-#print(len(filtered_paragrahps))
+#print(processedParagraphs)
+#print(len(processedParagraphs))
+
+#2.1 Dictionary build
+dictionary = gensim.corpora.Dictionary(processedParagraphs)
+
+#2.2 Remove stopwords
+stopwords_file = open('stopwords.txt')
+words = stopwords_file.read()
+
+
+
+
+
