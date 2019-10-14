@@ -50,7 +50,29 @@ stopwords = words.split(',')
 stopwords_id_list = [dictionary.token2id[word] for word in stopwords if word in dictionary.token2id ]
 dictionary.filter_tokens(stopwords_id_list)
 
-#2.2 Create corpus (bags of words)
+#2.2 Create corpus (bags of words format)
 corpus = [dictionary.doc2bow(paragraph) for paragraph in processedParagraphs]
 
 
+#3.1 Build TF-IDF model using corpus
+tfidf_model = gensim.models.TfidfModel(corpus)
+
+
+#3.2 Map Bags-of-Words into TF-IDF weights
+tfidf_corpus = tfidf_model[corpus]
+
+#3.3 Construct MatrixSimilarity object
+matrix_sim = gensim.similarities.MatrixSimilarity(corpus)
+
+#3.4 Repeat for LSI model
+lsi_model = gensim.models.LsiModel(tfidf_corpus, id2word=dictionary,num_topics=100)
+lsi_corpus = lsi_model[tfidf_corpus]
+lsi_matrix = gensim.similarities.MatrixSimilarity(lsi_corpus)
+
+#3.5 The first 3 LSI topics
+tp1 = lsi_model.show_topic(1)
+tp2 = lsi_model.show_topic(2)
+tp3 = lsi_model.show_topic(3)
+print(tp1)
+print(tp2)
+print(tp3)
