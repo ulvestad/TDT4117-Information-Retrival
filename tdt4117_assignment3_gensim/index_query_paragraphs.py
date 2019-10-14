@@ -40,14 +40,15 @@ for i, paragraph in enumerate(processedParagraphs):
 #print(processedParagraphs)
 #print(len(processedParagraphs))
 
+
 #2.1 Dictionary build
 dictionary = gensim.corpora.Dictionary(processedParagraphs)
 
 #2.2 Remove stopwords
 stopwords_file = open('stopwords.txt')
 words = stopwords_file.read()
+stopwords = words.split(',')
+stopwords_id_list = [dictionary.token2id[word] for word in stopwords if word in dictionary.token2id ]
 
-
-
-
-
+dictionary.filter_tokens(stopwords_id_list)
+corpus = [dictionary.doc2bow(paragraph) for paragraph in processedParagraphs]
