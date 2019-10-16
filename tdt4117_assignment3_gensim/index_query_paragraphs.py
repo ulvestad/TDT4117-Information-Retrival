@@ -76,3 +76,51 @@ tp3 = lsi_model.show_topic(3)
 print(tp1)
 print(tp2)
 print(tp3)
+
+
+#4.1 Query 
+q = "What is the function of money?"
+query = q.split()
+for i in range(len(query)):
+    query[i] = stemmer.stem(query[i].strip(string.punctuation).lower())
+query = dictionary.doc2bow(query)
+
+#4.2 Convert BOW to TF-IDF representation. 
+query_tfidf = tfidf_model[query]
+index = gensim.similarities.MatrixSimilarity(tfidf_corpus)
+
+for pair in query_tfidf:
+    weight = pair[1]
+    word = dictionary.get(pair[0])
+    print(word, weight)
+
+
+#4.3 Report top 3 the most relevant paragraphs for the query
+docs2similarity = enumerate(index[query_tfidf])
+sorted_docs = sorted(docs2similarity, key=lambda kv: -kv[1])[:3]
+relevant_paragraphs = []
+for pair in sorted_docs:
+    relevant_paragraphs.append(pair[0])
+for par in relevant_paragraphs:
+    print("[Paragraph: ", par+1, "]", "\n")
+    lines = filtered_paragrahps[par].splitlines(6)
+    filter_lines = ""
+    n = 0
+    try:
+        for i in range(6):
+            filter_lines += " " +lines[i].strip("\n\r")
+            n= i
+    except IndexError:
+        filter_lines = ""
+        for i in range(n+1):
+            filter_lines +=" " +lines[i]
+
+
+
+#4.4 Convert query TF-IDF representation into LSI-topics representation
+lsi_query = lsi_model[query_tfidf]
+sorted_lsi = (sorted(lsi_query, key=lambda kv: -abs(kv[1]))[:3] )
+all_topics = lsi_model.show_topics()
+for i in sorted_lsi:
+    print("[Topic ", i[0], "]")
+    print((all_topics[i[0]][1]))
