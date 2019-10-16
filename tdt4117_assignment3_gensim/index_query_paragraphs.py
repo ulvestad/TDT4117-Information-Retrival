@@ -106,11 +106,10 @@ for doc in retrievedDocs:
 
 
 #4.4 Convert query TF-IDF representation into LSI-topics representation
-
-lsi_query = lsi_model[query_tfidf]
-sorted_lsi = (sorted(lsi_query, key=lambda kv: -abs(kv[1]))[:3] )
+lsi_query = lsi_model[query]
+sorted_li = (sorted(lsi_query, key=lambda kv: -abs(kv[1]))[:3] )
 all_topics = lsi_model.show_topics()
-print("\nTop 3 relevant paragraphs: ")
-for i in sorted_lsi:
-    print("[Topic ", i[0], "]")
-    print((all_topics[i[0]][1]))
+print("\nMost relevant paragraphs: ")
+for para in sorted_li:
+    print("topic:", para[0])
+    print((all_topics[para[0]][1]))
