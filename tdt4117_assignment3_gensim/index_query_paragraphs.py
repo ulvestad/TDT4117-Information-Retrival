@@ -73,6 +73,43 @@ lsi_matrix = gensim.similarities.MatrixSimilarity(lsi_corpus)
 tp1 = lsi_model.show_topic(1)
 tp2 = lsi_model.show_topic(2)
 tp3 = lsi_model.show_topic(3)
+print('\nFirst 3 LSI topics:')
 print(tp1)
 print(tp2)
 print(tp3)
+
+
+#4.1 Query 
+q = "What is the function of money?"
+#q = "How taxes influence Economics?"
+noPunctuationQuery = q.lower().translate(str.maketrans('','',string.punctuation+"\r\t"))
+tokenizedQuery = [word_tokenize(noPunctuationQuery)][0] 
+for x, word in enumerate(tokenizedQuery):
+    tokenizedQuery[x] = stemmer.stem(tokenizedQuery[x])
+query = dictionary.doc2bow(tokenizedQuery)
+
+
+#4.2 Convert BOW to TF-IDF representation. 
+query_tfidf = tfidf_model[query]
+print("\nTF_IDF representation: ")
+for weight in query_tfidf:
+    print(dictionary.get(weight[0]), weight[1])
+
+
+#4.3 Report top 3 the most relevant paragraphs for the query
+index = gensim.similarities.MatrixSimilarity(tfidf_corpus)
+docs2similarity = enumerate(index[query_tfidf])
+retrievedDocs = sorted(docs2similarity, key=lambda kv: -kv[1])[:3]
+print("\nTop 3 TF-IDF's: ")
+for doc in retrievedDocs:
+    print("Paragraph: ",doc[0]+1)
+
+
+#4.4 Convert query TF-IDF representation into LSI-topics representation
+lsi_query = lsi_model[query]
+sorted_li = (sorted(lsi_query, key=lambda kv: -abs(kv[1]))[:3] )
+all_topics = lsi_model.show_topics()
+print("\nMost relevant paragraphs: ")
+for para in sorted_li:
+    print("topic:", para[0])
+    print((all_topics[para[0]][1]))
